@@ -37,7 +37,7 @@ public class ArquivoF extends Arquivo{
     
     public String add(String confSenha,String loing ,String senha, String nome){
         if(confSenha.equals(senha) && !loing.equals("") && !nome.equals("") && !senha.equals("")){
-            if(0!=busca(nome,true,"funcinario").size())
+            if(0!=busca(nome,true,"funcinario").size()&&buscaLong(loing).size()!=0)
                 return "erro nome ja cadastrado";
             SAXBuilder builder = new SAXBuilder();
             try{
@@ -73,27 +73,17 @@ public class ArquivoF extends Arquivo{
         return "erro cadastral";
     }
     public boolean confirma(String senha, String loing) {
-       SAXBuilder builder = new SAXBuilder();
-            try{
-                Document doc= builder.build(arquivo);
-                Element root = (Element) doc.getRootElement();
-                
-                List<Element> empregados = root.getChildren("funcinario");
-                
-                for (Element empregado : empregados) {
-                    if (empregado.getChildText("loing").equals(loing)) 
-                        return true;
-                }
-            
-        } catch (Exception ex) {
-                ex.printStackTrace();
+        List<Element> comfir = buscaLong(loing);
+        if(comfir.size()!=0){
+           if(comfir.get(0).getChildText("senha").equals(senha))
+               return true;
         }
         return false;
     }
     public String edita(String confSenha,String loing ,String senha, String nome){
         if(confSenha.equals(senha) && !loing.equals("") && !senha.equals("")){
-            if(0==busca(nome,true,"funcinario").size())
-                return "erro nao nome ja cadastrado";
+            if(0==busca(nome,true,"funcinario").size() && buscaLong(loing).size()!=0)
+                return "erro nome nao cadastrado";
             SAXBuilder builder = new SAXBuilder();
             try{
                 Document doc= builder.build(arquivo);
@@ -118,6 +108,25 @@ public class ArquivoF extends Arquivo{
             return  "preemcha os compos corretamente";
         return "erro cadastral";
     }
-
+    
+    public List buscaLong(String loing){
+        
+        List<Element> loings = new LinkedList<>();
+        
+        SAXBuilder builder = new SAXBuilder();
+        try{
+            Document doc= builder.build(arquivo);
+            Element root = (Element) doc.getRootElement();
+                
+            List<Element> funcinario = super.buscaInterna(root, false, "","funcinario");
+            for(int i=0;i<funcinario.size();i++){
+                if(funcinario.get(i).getChildText("loing").equals(loing))
+                    loings.add(funcinario.get(i));
+            }
+        }catch(Exception e){
+                
+        }
+        return loings;
+    }
     
 }
